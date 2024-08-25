@@ -1,4 +1,4 @@
-from formatos.formatos import codificar_tipo_r, codificar_tipo_i, codificar_tipo_s
+from formatos.formatos import codificar_tipo_r, codificar_tipo_i, codificar_tipo_s, codificar_tipo_b
 
 def ensamblar_instrucciones(instrucciones): #Recibe una lista de instrucciones
     instrucciones_binarias = [] #Lista vacía para guardar las instrucciones binarias
@@ -24,7 +24,7 @@ def ensamblar_instruccion(instruccion):
         return codificar_tipo_s(partes)
     
     elif opcode in ['beq', 'bne', 'blt', 'bge', 'bltu', 'bgeu']: #Si la instrucción es de tipo B
-        return "Tipo B"
+        return codificar_tipo_b(partes)
     
     elif opcode in ['lui', 'auipc']: #Si la instrucción es de tipo U
         return "Tipo U"

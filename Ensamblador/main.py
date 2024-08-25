@@ -8,7 +8,5 @@ def main():
     
     for instruccion_binaria in instrucciones_binarias:
         print(instruccion_binaria)
-    
-
 
 main()
