@@ -64,7 +64,16 @@ def codificar_tipo_b(partes):
     rs1 = format(int(partes[1][1:]), '05b') # Quitamos la x y convertimos el rs1 a binario
     rs2 = format(int(partes[2][1:]), '05b') # Quitamos la x y convertimos el rs2 a binario
     
-    imm = format(int(partes[3]), '012b') # Convierte el inmediato a 12 bits
+    
+    inmediato = int(partes[3])
+    if inmediato < 0:
+        # Convertir a complemento a 2
+        inmediato = (1 << 12) + inmediato  
+    
+    imm = format(inmediato, '012b')  # Convierte el inmediato a 12 bits
+    
+    print(imm)
+    
     
     return f"{imm[0]} {imm[2:8]} {rs2} {rs1} {funct3} {imm[8:12]} {imm[1]} {opcode}"
     
