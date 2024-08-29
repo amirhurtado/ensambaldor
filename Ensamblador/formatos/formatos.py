@@ -1,3 +1,5 @@
+import sys
+
 from .R import obtener_funct3_tipo_r, obtener_funct7_tipo_r
 from .I import obtener_opcode_tipo_i, obtener_funct3_tipo_i
 from .S import obtener_funct3_tipo_s
@@ -34,6 +36,10 @@ def codificar_tipo_i(partes):
         # Formato addi x1, x2, 10
         rs1 = partes[2]
         inmediato = partes[3]
+        
+    if( int(inmediato) < -2048 or int(inmediato) > 2047):
+        sys.exit("Inmediato fuera de rango para tipo I")
+    
     
     rd = format(int(partes[1][1:]), '05b') # Quitamos la x y convertimos el rd a binario
     rs1_bin = format(int(rs1[1:]), '05b') # Quitamos la x y convertimos el rs1 a binario
@@ -54,6 +60,9 @@ def codificar_tipo_s(partes):
     inmediato, rs2 = partes[2].split('(') # separamos el inmediato y el rs1
     rs2 = rs2[:-1]  # Quitamos el paréntesis de cierre
     
+    if( int(inmediato) < -2048 or int(inmediato) > 2047):
+        sys.exit("Inmediato fuera de rango para tipo S")
+    
     rs1 = format(int(rs1[1:]), '05b') # Quitamos la x y convertimos el rs1 a binario
     rs2 = format(int(rs2[1:]), '05b') # Quitamos la x y convertimos el rs2 a binario
     imm = format(int(inmediato), '012b') # Convierte el inmediato a 12 bits
@@ -73,6 +82,9 @@ def codificar_tipo_b(partes):
     if inmediato < 0:
         # Convertir a complemento a 2 para un número de 13 bits
         inmediato = (1 << 13) + inmediato  
+    
+    if( int(inmediato) < -4096 or int(inmediato) > 4094):
+        sys.exit("Inmediato fuera de rango para tipo B")
 
     # Convertir el inmediato a una cadena binaria de 13 bits
     imm = format(inmediato, '013b')
@@ -86,7 +98,7 @@ def codificar_tipo_u(partes):
     inmediato = format(int(partes[2]), '032b')  # Convierte el inmediato a 20 bits
     
     
-    return f"{inmediato} {rd} {opcode}"
+    return f"{inmediato[0:20]} {rd} {opcode}"
     
     
     
