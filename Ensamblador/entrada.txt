@@ -16,7 +16,7 @@ or x19, x20, x21
 xor x22, x23, x24 
 sll x25, x26, x5  
 srl x27, x28, x3    
-slt x29, x30, x31  
+slt x29, x30, s0  
 
 label3:
 beq x1, x2, label1
