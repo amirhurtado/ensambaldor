@@ -43,15 +43,20 @@ def leer_instrucciones(archivo):
 labels = dict()
 
 def leer_labels(instrucciones):
-    for i, instruccion in enumerate(instrucciones, 1):
+    i = 0
+    for instruccion in instrucciones.copy():
+        if instruccion == "":
+            continue
         if ":" in instruccion:
-            labels[instruccion.replace(":", "")] = i+1
+            labels[instruccion.replace(":", "")] = i
+            i -= 1
+            instrucciones.remove(instruccion)
+        i += 1
             
 def distancia_label(linea_label, linea):
     distance = linea_label - linea
-    distancia_binaria = int(distance*32).to_bytes(length=4, signed=True)
-    binario_normal = ''.join(format(byte, '08b') for byte in distancia_binaria)
-    return binario_normal
+    return numero_a_binario(distance*4, 32)
+    
 
 def numero_a_binario(number: int | str, length=4):
     if isinstance(number, str):

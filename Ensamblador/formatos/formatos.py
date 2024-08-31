@@ -4,6 +4,7 @@ from .R import obtener_funct3_tipo_r, obtener_funct7_tipo_r
 from .I import obtener_opcode_tipo_i, obtener_funct3_tipo_i
 from .S import obtener_funct3_tipo_s
 from .B import obtener_funct3_tipo_b
+from .U import obtener_opcode_tipo_u
 from utilidades import labels, distancia_label, numero_a_binario, registros
 
 def codificar_tipo_r(partes):
@@ -19,7 +20,7 @@ def codificar_tipo_r(partes):
     rs1 = registros(partes[2])
     rs2 = registros(partes[3])  
     
-    return f"{funct7} {rs2} {rs1} {funct3} {rd} {opcode}"
+    return f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
 
 
 
@@ -53,25 +54,25 @@ def codificar_tipo_i(partes):
     if(partes[0] == "srai"):
         imm_bin = imm_bin[:1] + "1" + imm_bin[2:]
     
-    return f"{imm_bin} {rs1_bin} {funct3} {rd} {opcode}"
+    return f"{imm_bin}{rs1_bin}{funct3}{rd}{opcode}"
     
     
 def codificar_tipo_s(partes):
     opcode = "0100011"  # opcode para las instrucciones tipo S
     funct3 = obtener_funct3_tipo_s(partes[0])
     
-    rs1 = partes[1]
-    inmediato, rs2 = partes[2].split('(') # separamos el inmediato y el rs1
-    rs2 = rs2[:-1]  # Quitamos el paréntesis de cierre
+    rs2 = partes[1]
+    inmediato, rs1 = partes[2].split('(') # separamos el inmediato y el rs1
+    rs1 = rs1[:-1]  # Quitamos el paréntesis de cierre
     
     if( int(inmediato) < -2048 or int(inmediato) > 2047):
         sys.exit("Inmediato fuera de rango para tipo S")
     
     rs1 = registros(rs1) # Quitamos la x y convertimos el rs1 a binario
     rs2 = registros(rs2) # Quitamos la x y convertimos el rs2 a binario
-    imm = numero_a_binario(inmediato) # Convierte el inmediato a 12 bits
+    imm = numero_a_binario(inmediato, 12) # Convierte el inmediato a 12 bits
     
-    return f"{imm[0:7]} {rs2} {rs1} {funct3} {imm[7:12]} {opcode}"
+    return f"{imm[:7]}{rs2}{rs1}{funct3}{imm[7:]}{opcode}"
     
     
 def codificar_tipo_b(partes, i):
@@ -94,18 +95,18 @@ def codificar_tipo_b(partes, i):
 
     # Convertir el inmediato a una cadena binaria de 13 bits
     # imm = format(inmediato, '013b')
-    distancia = distancia[-12:]
+    distancia = distancia[-13:]
 
-    return f"{distancia[0]} {distancia[2:8]} {rs2} {rs1} {funct3} {distancia[8:12]} {distancia[1]} {opcode}"
+    return f"{distancia[0]}{distancia[2:8]}{rs2}{rs1}{funct3}{distancia[8:12]}{distancia[1]}{opcode}"
 
 
 def codificar_tipo_u(partes):
-    opcode = "0110111"  # opcode para las instrucciones tipo U
+    opcode = obtener_opcode_tipo_u(partes[0])  # opcode para las instrucciones tipo U
     rd = registros(partes[1]) # Quitamos la x y convertimos el rd a binario
-    inmediato = format(int(partes[2]), '032b')  # Convierte el inmediato a 20 bits
+    inmediato = numero_a_binario(partes[2], 20)  # Convierte el inmediato a 20 bits
     
     
-    return f"{inmediato[0:20]} {rd} {opcode}"
+    return f"{inmediato}{rd}{opcode}"
     
 def codificar_tipo_j(partes, i):
     opcode = "1101111"
@@ -113,9 +114,9 @@ def codificar_tipo_j(partes, i):
     inmediato = partes[2]
     linea_label = labels.get(inmediato)
     distancia = distancia_label(linea_label, i)
-    distancia = distancia[-20:]
+    distancia = distancia[-21:]
     
-    return f"{distancia[0]}{distancia[10:]}{distancia[9]}{distancia[1:9]}{rd}{opcode}"
+    return f"{distancia[0]}{distancia[10:20]}{distancia[9]}{distancia[1:9]}{rd}{opcode}"
     
     
     

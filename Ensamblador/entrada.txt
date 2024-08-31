@@ -14,9 +14,9 @@ sub x4, x5, x6
 and x16, x17, x18 
 or x19, x20, x21  
 xor x22, x23, x24 
-sll x25, x26, x5  
-srl x27, x28, x3    
-slt x29, x30, s0  
+sll x25, x26, a5  
+srl x27, x28, s0  
+slt x29, x30, x31  
 
 label3:
 beq x1, x2, label1
@@ -24,7 +24,7 @@ bne x3, x4, label2
 blt x5, x6, label3    
 bge x7, x8, label4    
 jal x4, label1            
-jalr x9, 0(x3)        
+jalr x1, 0(x9)        
 
 label4:
 auipc x4, 100    

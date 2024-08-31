@@ -2,8 +2,8 @@ from formatos.formatos import codificar_tipo_r, codificar_tipo_i, codificar_tipo
 
 def ensamblar_instrucciones(instrucciones): #Recibe una lista de instrucciones
     instrucciones_binarias = [] #Lista vacía para guardar las instrucciones binarias
-    instrucciones = [inst for inst in instrucciones if not(":" in inst or inst == "")]
-    for i, instruccion in enumerate(instrucciones, 1):
+    
+    for i, instruccion in enumerate(instrucciones, 0):
         #Recorre cada instrucción en la lista de instrucciones
         instruccion_binaria = ensamblar_instruccion(instruccion, i) #Va y ensambla la instrucción
         instrucciones_binarias.append(instruccion_binaria) #Agrega la instrucción binaria a la lista de instrucciones binarias
