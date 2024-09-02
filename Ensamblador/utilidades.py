@@ -52,10 +52,100 @@ def leer_labels(instrucciones):
             i -= 1
             instrucciones.remove(instruccion)
         i += 1
+        
+        
+        
+    
+def equivalencia_pseudo_instructions(instrucciones):
+    # Diccionario de equivalencias de pseudo-instrucciones a instrucciones reales
+    equivalencias = {
+        'nop': 'addi x0, x0, 0',
+        'mv': 'addi {rd}, {rs}, 0',
+        'not': 'xori {rd}, {rs}, -1',
+        'neg': 'sub {rd}, x0, {rs}',
+        'seqz': 'sltiu {rd}, {rs}, 1',
+        'snez': 'sltu {rd}, x0, {rs}',
+        'sltz': 'slt {rd}, {rs}, x0',
+        'sgtz': 'slt {rd}, x0, {rs}',
+        'beqz': 'beq {rs}, x0, {offset}',
+        'bnez': 'bne {rs}, x0, {offset}',
+        'blez': 'bge x0, {rs}, {offset}',
+        'bgez': 'bge {rs}, x0, {offset}',
+        'bltz': 'blt {rs}, x0, {offset}',
+        'bgtz': 'blt x0, {rs}, {offset}',
+        'bgt': 'blt {rt}, {rs}, {offset}',
+        'ble': 'bge {rt}, {rs}, {offset}',
+        'bgtu': 'bltu {rt}, {rs}, {offset}',
+        'bleu': 'bgeu {rt}, {rs}, {offset}',
+        'j': 'jal x0, {offset}',
+        'jal': 'jal x1, {offset}',
+        'jr': 'jalr x0, {rs}, 0',
+        'jalr': 'jalr x1, {rs}, 0',
+        'ret': 'jalr x0, x1, 0'
+    }
+
+    # Lista para almacenar las instrucciones traducidas
+    instrucciones_traducidas = []
+
+    for instruccion in instrucciones:
+        # Separar la instrucción y los registros/operandos
+        partes = instruccion.split(' ', 1)
+        nombre_instruccion = partes[0]
+        
+        # Si la instrucción tiene operandos
+        if len(partes) > 1:
+            operandos = partes[1]
+        else:
+            operandos = ''
+        
+        # Buscar la equivalencia en el diccionario
+        if nombre_instruccion in equivalencias:
+            instruccion_equivalente = equivalencias[nombre_instruccion]
+
+            # Reemplazar los placeholders {rd}, {rs}, {rt} y {offset} según la instrucción
+            if '{rd}' in instruccion_equivalente and '{rs}' in instruccion_equivalente:
+                rd, rs = operandos.split(', ')
+                instruccion_equivalente = instruccion_equivalente.format(rd=rd, rs=rs)
+            elif '{rt}' in instruccion_equivalente and '{rs}' in instruccion_equivalente and '{offset}' in instruccion_equivalente:
+                rs, rt, offset = operandos.split(', ')
+                instruccion_equivalente = instruccion_equivalente.format(rs=rs, rt=rt, offset=offset)
+            elif '{rs}' in instruccion_equivalente and '{offset}' in instruccion_equivalente:
+                rs, offset = operandos.split(', ')
+                instruccion_equivalente = instruccion_equivalente.format(rs=rs, offset=offset)
+            elif '{offset}' in instruccion_equivalente:
+                instruccion_equivalente = instruccion_equivalente.format(offset=operandos)
+            elif '{rs}' in instruccion_equivalente:
+                rs = operandos.strip()
+                instruccion_equivalente = instruccion_equivalente.format(rs=rs)
+           
+
+            instrucciones_traducidas.append(instruccion_equivalente)
+        else:
+            # Si la instrucción no está en el diccionario, se deja tal cual
+            instrucciones_traducidas.append(instruccion)
+            
+    print(instrucciones)
+    print(instrucciones_traducidas)
+    print("\n\n\n")
+
+    return instrucciones_traducidas
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
 def distancia_label(linea_label, linea):
     distance = linea_label - linea
     return numero_a_binario(distance*4, 32)
+
+
     
 
 def numero_a_binario(number: int | str, length=4):
@@ -74,3 +164,4 @@ def registros(reg: str):
         reg = x_reg
     num_reg = int(reg[1:])
     return numero_a_binario(num_reg, 5)
+
