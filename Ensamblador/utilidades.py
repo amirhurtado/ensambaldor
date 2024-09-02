@@ -78,9 +78,7 @@ def equivalencia_pseudo_instructions(instrucciones):
         'bgtu': 'bltu {rt}, {rs}, {offset}',
         'bleu': 'bgeu {rt}, {rs}, {offset}',
         'j': 'jal x0, {offset}',
-        'jal': 'jal x1, {offset}',
         'jr': 'jalr x0, {rs}, 0',
-        'jalr': 'jalr x1, {rs}, 0',
         'ret': 'jalr x0, x1, 0'
     }
 
@@ -118,27 +116,12 @@ def equivalencia_pseudo_instructions(instrucciones):
                 rs = operandos.strip()
                 instruccion_equivalente = instruccion_equivalente.format(rs=rs)
            
-
             instrucciones_traducidas.append(instruccion_equivalente)
         else:
             # Si la instrucción no está en el diccionario, se deja tal cual
             instrucciones_traducidas.append(instruccion)
-            
-    print(instrucciones)
-    print(instrucciones_traducidas)
-    print("\n\n\n")
-
+    
     return instrucciones_traducidas
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
             
             
 def distancia_label(linea_label, linea):

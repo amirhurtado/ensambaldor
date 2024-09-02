@@ -28,3 +28,5 @@ values = ['00000000000000010000000010000011', '11111111110000100001000110000011'
 for value, binary, inst in zip(values, instrucciones_binarias, instrucciones):
     if value != binary:
         print(f"Diferent value: {binary}\nExpected:\t{value}\nInstruction: {inst}")
+    else:
+        print(f"Value: {binary}\nInstruction: {inst}")
