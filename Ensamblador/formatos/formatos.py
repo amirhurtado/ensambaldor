@@ -27,7 +27,6 @@ def codificar_tipo_r(partes):
 def codificar_tipo_i(partes):
     opcode = obtener_opcode_tipo_i(partes[0])
     funct3 = obtener_funct3_tipo_i(partes[0])
-
     
      # Verificamos el formato de la instrucción
     if '(' in partes[2]:
