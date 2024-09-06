@@ -78,7 +78,9 @@ def equivalencia_pseudo_instructions(instrucciones):
         'bgtu': 'bltu {rt}, {rs}, {offset}',
         'bleu': 'bgeu {rt}, {rs}, {offset}',
         'j': 'jal x0, {offset}',
+        'jal': 'jal x1, {offset}',
         'jr': 'jalr x0, {rs}, 0',
+        'jalr': 'jalr x1, {rs}, 0',
         'ret': 'jalr x0, x1, 0'
     }
 
@@ -89,39 +91,60 @@ def equivalencia_pseudo_instructions(instrucciones):
         # Separar la instrucción y los registros/operandos
         partes = instruccion.split(' ', 1)
         nombre_instruccion = partes[0]
-        
-        # Si la instrucción tiene operandos
-        if len(partes) > 1:
-            operandos = partes[1]
-        else:
-            operandos = ''
-        
-        # Buscar la equivalencia en el diccionario
-        if nombre_instruccion in equivalencias:
-            instruccion_equivalente = equivalencias[nombre_instruccion]
+        operandos = partes[1] if len(partes) > 1 else ''
 
-            # Reemplazar los placeholders {rd}, {rs}, {rt} y {offset} según la instrucción
-            if '{rd}' in instruccion_equivalente and '{rs}' in instruccion_equivalente:
-                rd, rs = operandos.split(', ')
-                instruccion_equivalente = instruccion_equivalente.format(rd=rd, rs=rs)
-            elif '{rt}' in instruccion_equivalente and '{rs}' in instruccion_equivalente and '{offset}' in instruccion_equivalente:
-                rs, rt, offset = operandos.split(', ')
-                instruccion_equivalente = instruccion_equivalente.format(rs=rs, rt=rt, offset=offset)
-            elif '{rs}' in instruccion_equivalente and '{offset}' in instruccion_equivalente:
-                rs, offset = operandos.split(', ')
-                instruccion_equivalente = instruccion_equivalente.format(rs=rs, offset=offset)
-            elif '{offset}' in instruccion_equivalente:
-                instruccion_equivalente = instruccion_equivalente.format(offset=operandos)
-            elif '{rs}' in instruccion_equivalente:
-                rs = operandos.strip()
-                instruccion_equivalente = instruccion_equivalente.format(rs=rs)
-           
-            instrucciones_traducidas.append(instruccion_equivalente)
+        # Manejar las pseudo-instrucciones 'jal' y 'jalr'
+        if nombre_instruccion == 'jal':
+            if ',' in operandos:
+                instrucciones_traducidas.append(instruccion)  # Es una instrucción normal
+            else:
+                instruccion_equivalente = equivalencias['jal'].format(offset=operandos)
+                instrucciones_traducidas.append(instruccion_equivalente)
+        elif nombre_instruccion == 'jalr':
+            if ',' in operandos:
+                instrucciones_traducidas.append(instruccion)  # Es una instrucción normal
+            else:
+                instruccion_equivalente = equivalencias['jalr'].format(rs=operandos)
+                instrucciones_traducidas.append(instruccion_equivalente)
+            
+        
         else:
-            # Si la instrucción no está en el diccionario, se deja tal cual
-            instrucciones_traducidas.append(instruccion)
+            # Buscar la equivalencia en el diccionario
+            if nombre_instruccion in equivalencias:
+                instruccion_equivalente = equivalencias[nombre_instruccion]
+
+                # Reemplazar los placeholders {rd}, {rs}, {rt} y {offset} según la instrucción
+                if '{rt}' in instruccion_equivalente and '{rs}' in instruccion_equivalente and '{offset}' in instruccion_equivalente:
+                    # Extraer los tres operandos: rt, rs y offset
+                    rs, rt, offset = operandos.split(', ')
+                    instruccion_equivalente = instruccion_equivalente.format(rt=rt, rs=rs, offset=offset)
+
+                elif '{rd}' in instruccion_equivalente and '{rs}' in instruccion_equivalente:
+                    rd, rs = operandos.split(', ')
+                    instruccion_equivalente = instruccion_equivalente.format(rd=rd, rs=rs)
+
+                elif '{rs}' in instruccion_equivalente and '{offset}' in instruccion_equivalente:
+                    rs, offset = operandos.split(', ')
+                    instruccion_equivalente = instruccion_equivalente.format(rs=rs, offset=offset)
+
+                elif '{offset}' in instruccion_equivalente:
+                    instruccion_equivalente = instruccion_equivalente.format(offset=operandos)
+
+                elif '{rs}' in instruccion_equivalente:
+                    rs = operandos.strip()
+                    instruccion_equivalente = instruccion_equivalente.format(rs=rs)
+            
+                instrucciones_traducidas.append(instruccion_equivalente)
+            else:
+                # Si la instrucción no está en el diccionario, se deja tal cual
+                instrucciones_traducidas.append(instruccion)
+                
+    print ("\nORIGINALES: ",   instrucciones)            
+    print ("\nEQUIVALENCIAS: ", instrucciones_traducidas)
     
+
     return instrucciones_traducidas
+
             
             
 def distancia_label(linea_label, linea):
