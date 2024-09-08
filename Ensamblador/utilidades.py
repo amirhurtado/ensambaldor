@@ -1,3 +1,4 @@
+from functools import singledispatch
 
 equivalencias = {
     "zero": "x0",
@@ -35,6 +36,7 @@ equivalencias = {
     "t6": "x31",
 }
 
+
 def leer_instrucciones(archivo):
     with open(archivo, 'r') as archivo:
         instrucciones = archivo.readlines() #Lee todas las lineas del archivo y las guarda en una lista
@@ -52,8 +54,6 @@ def leer_labels(instrucciones):
             i -= 1
             instrucciones.remove(instruccion)
         i += 1
-        
-        
         
     
 def equivalencia_pseudo_instructions(instrucciones):
@@ -151,6 +151,20 @@ def distancia_label(linea_label, linea):
     distance = linea_label - linea
     return numero_a_binario(distance*4, 32)
 
+def bin_to_decimal(binary: str):
+    return int("0b" + binary, 2)
+
+def cut_symbol(symbol: str, line=None):
+    try:
+        symbol = distancia_label(symbol,line)
+    except ValueError:
+        pass
+    symbol = numero_a_binario(symbol, 32)
+    new_symbol = {
+        "symbol1": bin_to_decimal(symbol[:21]),
+        "symbol2": bin_to_decimal(symbol[21:]),
+    }
+    return new_symbol
 
     
 

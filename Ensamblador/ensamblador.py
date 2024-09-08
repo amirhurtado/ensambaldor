@@ -1,12 +1,20 @@
 from formatos.formatos import codificar_tipo_r, codificar_tipo_i, codificar_tipo_s, codificar_tipo_b, codificar_tipo_u, codificar_tipo_j
+from pseudoinstrucciones import is_pseudo, compile_pseudo
 
 def ensamblar_instrucciones(instrucciones): #Recibe una lista de instrucciones
     instrucciones_binarias = [] #Lista vacía para guardar las instrucciones binarias
     
     for i, instruccion in enumerate(instrucciones, 0):
         #Recorre cada instrucción en la lista de instrucciones
-        instruccion_binaria = ensamblar_instruccion(instruccion, i) #Va y ensambla la instrucción
-        instrucciones_binarias.append(instruccion_binaria) #Agrega la instrucción binaria a la lista de instrucciones binarias
+        match, equivalencia = is_pseudo(instruccion)
+        if match != False:
+            instrucciones_eq = compile_pseudo(equivalencia, match, i)
+            for instruccion_eq in instrucciones_eq:
+                instruccion_binaria = ensamblar_instruccion(instruccion_eq, i) #Va y ensambla la instrucción
+                instrucciones_binarias.append(instruccion_binaria)
+        else:
+            instruccion_binaria = ensamblar_instruccion(instruccion, i) #Va y ensambla la instrucción
+            instrucciones_binarias.append(instruccion_binaria) #Agrega la instrucción binaria a la lista de instrucciones binarias
         
     return instrucciones_binarias #Devuelve la lista de instrucciones binarias
 

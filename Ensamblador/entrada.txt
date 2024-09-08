@@ -17,14 +17,6 @@ bgt x1, x2, label1
 ble x1, x2, label1
 bgtu x1, x2, label1
 bleu x1, x2, label1
-j label1
-jal label1
-jal x1, label1
-jr x1
-jalr x5
-jalr x1, x2, 12
-ret
-
 
 
 
