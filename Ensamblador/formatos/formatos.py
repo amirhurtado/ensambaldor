@@ -40,8 +40,8 @@ def codificar_tipo_i(partes):
     
     if "0x" in inmediato:
         inmediato = int(inmediato, 16)
-    if( int(inmediato) < -2048 or int(inmediato) > 2047):
-        sys.exit("Inmediato fuera de rango para tipo I")
+    # if( int(inmediato) < -2048 or int(inmediato) > 2047):
+    #     sys.exit("Inmediato fuera de rango para tipo I")
     
     
     rd = registros(partes[1])  # Quitamos la x y convertimos el rd a binario

@@ -1,4 +1,5 @@
 label1:
+la x3, 3800
 nop
 mv x1, x2
 not x1, x2

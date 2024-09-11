@@ -157,12 +157,12 @@ def bin_to_decimal(binary: str):
 def cut_symbol(symbol: str, line=None):
     try:
         symbol = distancia_label(symbol,line)
-    except ValueError:
+    except:
         pass
     symbol = numero_a_binario(symbol, 32)
     new_symbol = {
-        "symbol1": bin_to_decimal(symbol[:21]),
-        "symbol2": bin_to_decimal(symbol[21:]),
+        "symbol1": bin_to_decimal(symbol[:20]),
+        "symbol2": bin_to_decimal(symbol[20:]),
     }
     return new_symbol
 
