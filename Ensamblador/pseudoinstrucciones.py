@@ -23,10 +23,10 @@ pseudoinstrucciones = {
     "^bgtu\\s+(?P<rs>\\w+),\\s*(?P<rt>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bltu {rt}, {rs}, {offset}",
     "^bleu\\s+(?P<rs>\\w+),\\s*(?P<rt>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bgeu {rt}, {rs}, {offset}",
     "^j\\s+(?P<offset>\\w+)\\s*$": "jal x0, {offset}",
-    "^jal\\s+(?P<offset>\\w+)": "jal x1, {offset}",
+    "^jal\\s+(?P<offset>\\w+)\\s*$": "jal x1, {offset}",
     "^jr\\s+(?P<rs>\\w+)\\s*$": "jalr x0, {rs}, 0",
     "^jalr\\s+(?P<rs>\\w+)\\s*$": "jalr x1, {rs}, 0",
-    "^ret\\s+(?P<rs>\\w+)\\s*$": "jalr x0, x1, 0",
+    "^ret\\s*$": "jalr x0, x1, 0",
     "^call\\s*(?P<symbol>\\w+)\\s*$": ["auipc x1, {symbol1}", "jalr x1, x1, {symbol2}"],
     "^tail\\s*(?P<symbol>\\w+)\\s*$": ["auipc x6, {symbol1}", "jalr x0, x6, {symbol2}"],
     "^li\\s+(?P<rd>\\w+),\\s*(?P<symbol>[+-]?\\d+|0[xX][0-9a-fA-F]+)\\s*$": ["lui {rd}, {symbol1}", "addi {rd}, {symbol2}"],
@@ -36,6 +36,7 @@ pseudoinstrucciones = {
 }
 
 def is_pseudo(instruction: str):
+    
     for pattern, equivalence in pseudoinstrucciones.items():
         match = re.match(fr"{pattern}", instruction)
         if match:

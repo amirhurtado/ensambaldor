@@ -1,25 +1,5 @@
 label1:
-la x3, 3800
-nop
-mv x1, x2
-not x1, x2
-neg x1, x2
-seqz x1, x2
-snez x1, x2
-sltz x1, x2
-sgtz x1, x2
-beqz x1, label1
-bnez x1, label1
-blez x1, label1
-bgez x1, label1
-bltz x1, label1
-bgtz x1, label1
-bgt x1, x2, label1
-ble x1, x2, label1
-bgtu x1, x2, label1
-bleu x1, x2, label1
-
-
+la x3, 40000
 
 
 

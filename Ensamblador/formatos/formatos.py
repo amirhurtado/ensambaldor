@@ -8,11 +8,10 @@ from .U import obtener_opcode_tipo_u
 from utilidades import labels, distancia_label, numero_a_binario, registros
 
 def codificar_tipo_r(partes):
+    print(partes)
     opcode = "0110011"  # opcode para las instrucciones tipo R
     funct3 = obtener_funct3_tipo_r(partes[0])
     funct7 = obtener_funct7_tipo_r(partes[0])
-    
-    
     #partes [1] es el rd, [2] es el rs1, [3] es el rs2
     #[1:] para quitar el x
     #format(int, '05b') para convertir el entero a binario de 5 bits
@@ -25,6 +24,7 @@ def codificar_tipo_r(partes):
 
 
 def codificar_tipo_i(partes):
+    print(partes)
     opcode = obtener_opcode_tipo_i(partes[0])
     funct3 = obtener_funct3_tipo_i(partes[0])
     
@@ -57,6 +57,7 @@ def codificar_tipo_i(partes):
     
     
 def codificar_tipo_s(partes):
+    print(partes)
     opcode = "0100011"  # opcode para las instrucciones tipo S
     funct3 = obtener_funct3_tipo_s(partes[0])
     
@@ -75,6 +76,7 @@ def codificar_tipo_s(partes):
     
     
 def codificar_tipo_b(partes, i):
+    print(partes)
     opcode = "1100011"  # opcode para las instrucciones tipo B
     funct3 = obtener_funct3_tipo_b(partes[0])
     
@@ -100,6 +102,7 @@ def codificar_tipo_b(partes, i):
 
 
 def codificar_tipo_u(partes):
+    print(partes)
     opcode = obtener_opcode_tipo_u(partes[0])  # opcode para las instrucciones tipo U
     rd = registros(partes[1]) # Quitamos la x y convertimos el rd a binario
     inmediato = numero_a_binario(partes[2], 20)  # Convierte el inmediato a 20 bits
@@ -108,6 +111,7 @@ def codificar_tipo_u(partes):
     return f"{inmediato}{rd}{opcode}"
     
 def codificar_tipo_j(partes, i):
+    print(partes)
     opcode = "1101111"
     rd = registros(partes[1])
     inmediato = partes[2]
