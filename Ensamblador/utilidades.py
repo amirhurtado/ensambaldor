@@ -1,4 +1,5 @@
 from functools import singledispatch
+from bitstring import BitArray, Bits
 
 equivalencias = {
     "zero": "x0",
@@ -147,22 +148,27 @@ def equivalencia_pseudo_instructions(instrucciones):
 
             
             
-def distancia_label(linea_label, linea):
+def distancia_label(linea_label: str, linea):
+    if linea_label.isnumeric():
+        raise ValueError
     distance = linea_label - linea
     return numero_a_binario(distance*4, 32)
 
 def bin_to_decimal(binary: str):
-    return int("0b" + binary, 2)
+    bin = Bits(bin=binary)
+    return bin.int
 
 def cut_symbol(symbol: str, line=None):
     try:
         symbol = distancia_label(symbol,line)
-    except:
+    except ValueError:
         pass
-    symbol = numero_a_binario(symbol, 32)
+
+    symbol = BitArray(uint=int(symbol), length=32)
+    symbol1 = symbol << 12    
     new_symbol = {
-        "symbol1": bin_to_decimal(symbol[:20]),
-        "symbol2": bin_to_decimal(symbol[20:]),
+        "symbol1": bin_to_decimal(symbol1.bin[:20]),
+        "symbol2": bin_to_decimal(symbol.bin[-12:]),
     }
     return new_symbol
 
