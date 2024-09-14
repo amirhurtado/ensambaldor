@@ -148,9 +148,10 @@ def equivalencia_pseudo_instructions(instrucciones):
 
             
             
-def distancia_label(linea_label: str, linea):
-    if linea_label.isnumeric():
-        raise ValueError
+def distancia_label(linea_label: str | int, linea):
+    if isinstance(linea_label, str):
+        if linea_label.isnumeric():
+            raise ValueError
     distance = linea_label - linea
     return numero_a_binario(distance*4, 32)
 
