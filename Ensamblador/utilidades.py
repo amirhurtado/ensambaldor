@@ -1,5 +1,5 @@
-from functools import singledispatch
 from bitstring import BitArray, Bits
+import re
 
 equivalencias = {
     "zero": "x0",
@@ -37,6 +37,38 @@ equivalencias = {
     "t6": "x31",
 }
 
+pseudoinstrucciones = {
+    "^nop\\s*$": "addi x0, x0, 0",
+    "^mv\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)\\s*$": "addi {rd}, {rs}, 0",
+    "^not\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)$": "xori {rd}, {rs}, -1",
+    "^neg\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)$": "sub {rd}, x0, {rs}",
+    "^negw\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)$": "subw {rd}, x0, {rs}",
+    "^seqz\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)$": "sltiu {rd}, {rs}, 1",
+    "^snez\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)$": "sltu {rd}, x0, {rs}",
+    "^sltz\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)$": "slt {rd}, {rs}, x0",
+    "^sgtz\\s+(?P<rd>\\w+),\\s*(?P<rs>\\w+)$": "slt {rd}, x0, {rs}",
+    "^beqz\\s+(?P<rs>\\w+),\\s*(?P<offset>\\w+)\\s*$": "beq {rs}, x0, {offset}",
+    "^bnez\\s+(?P<rs>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bne {rs}, x0, {offset}",
+    "^blez\\s+(?P<rs>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bge x0, {rs}, {offset}",
+    "^bgez\\s+(?P<rs>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bge {rs}, x0, {offset}",
+    "^bltz\\s+(?P<rs>\\w+),\\s*(?P<offset>\\w+)\\s*$": "blt {rs}, x0, {offset}",
+    "^bgtz\\s+(?P<rs>\\w+),\\s*(?P<offset>\\w+)\\s*$": "blt x0, {rs}, {offset}",
+    "^bgt\\s+(?P<rs>\\w+),\\s*(?P<rt>\\w+),\\s*(?P<offset>\\w+)\\s*$": "blt {rt}, {rs}, {offset}",
+    "^ble\\s+(?P<rs>\\w+),\\s*(?P<rt>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bge {rt}, {rs}, {offset}",
+    "^bgtu\\s+(?P<rs>\\w+),\\s*(?P<rt>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bltu {rt}, {rs}, {offset}",
+    "^bleu\\s+(?P<rs>\\w+),\\s*(?P<rt>\\w+),\\s*(?P<offset>\\w+)\\s*$": "bgeu {rt}, {rs}, {offset}",
+    "^j\\s+(?P<offset>\\w+)\\s*$": "jal x0, {offset}",
+    "^jal\\s+(?P<offset>\\w+)\\s*$": "jal x1, {offset}",
+    "^jr\\s+(?P<rs>\\w+)\\s*$": "jalr x0, {rs}, 0",
+    "^jalr\\s+(?P<rs>\\w+)\\s*$": "jalr x1, {rs}, 0",
+    "^ret\\s*$": "jalr x0, x1, 0",
+    "^call\\s*(?P<symbol>\\w+)\\s*$": ["auipc x1, {symbol1}", "jalr x1, x1, {symbol2}"],
+    "^tail\\s*(?P<symbol>\\w+)\\s*$": ["auipc x6, {symbol1}", "jalr x0, x6, {symbol2}"],
+    "^li\\s+(?P<rd>\\w+),\\s*(?P<symbol>[+-]?\\d+|0[xX][0-9a-fA-F]+)\\s*$": ["lui {rd}, {symbol1}", "addi {rd}, {symbol2}"],
+    "^l(?P<letter>[bhwd])\\s+(?P<rd>\\w+),\\s*(?P<symbol>[+-]?\\d+|0[xX][0-9a-fA-F]+)\\s*$": ["auipc {rd}, {symbol1}", "l{letter} {rd}, {symbol1}({rd})"],
+    "^s(?P<letter>[bhwd])\\s+(?P<rd>\\w+),\\s*(?P<symbol>[+-]?\\d+|0[xX][0-9a-fA-F]+),\\s*(?P<rt>\\w+)\\s*$": ["auipc {rt}, {symbol1}", "s{letter} {rd}, {symbol2}({rt})"],
+    "^la\\s+(?P<rd>\\w+),\\s*(?P<symbol>[+-]?\\d+|0[xX][0-9a-fA-F]+)\\s*$": ["auipc {rd}, {symbol1}", "addi {rd}, {rd}, {symbol2}"]
+}
 
 def leer_instrucciones(archivo):
     with open(archivo, 'r') as archivo:
@@ -45,16 +77,7 @@ def leer_instrucciones(archivo):
 
 labels = dict()
 
-def leer_labels(instrucciones):
-    i = 0
-    for instruccion in instrucciones.copy():
-        if instruccion == "":
-            continue
-        if ":" in instruccion:
-            labels[instruccion.replace(":", "")] = i
-            i -= 1
-            instrucciones.remove(instruccion)
-        i += 1
+
         
     
 def equivalencia_pseudo_instructions(instrucciones):
@@ -146,7 +169,13 @@ def equivalencia_pseudo_instructions(instrucciones):
 
     return instrucciones_traducidas
 
-            
+def is_pseudo(instruction: str):
+    
+    for pattern, equivalence in pseudoinstrucciones.items():
+        match = re.match(fr"{pattern}", instruction)
+        if match:
+            return match.groupdict(), equivalence
+    return False, False
             
 def distancia_label(linea_label: str | int, linea):
     if isinstance(linea_label, str):
@@ -173,13 +202,19 @@ def cut_symbol(symbol: str, line=None):
     }
     return new_symbol
 
-    
-
-def numero_a_binario(number: int | str, length=4):
+def numero_a_binario(number: int | str, length=4, signed=True):
     if isinstance(number, str):
         if "0x" in number:
             number = int(number, 16)
-    binary = int(number).to_bytes(length=4, signed=True)
+        else:
+            number = int(number)
+    if signed:
+        if not puede_representarse_con_signo(number, length):
+            raise ValueError(f"No se puede representar este numero ({number}) en {length} bits")
+    else:
+        if not se_puede_representar_sin_signo(number, length):
+            raise ValueError(f"No se puede representar este numero ({number}) en {length} bits")
+    binary = int(number).to_bytes(length=4, signed=signed)
     normal_binary = ''.join(format(byte, '08b') for byte in binary)
     return normal_binary[-length:]
 
@@ -190,5 +225,22 @@ def registros(reg: str):
             raise ValueError(f"Registro Invalido: '{reg}'")
         reg = x_reg
     num_reg = int(reg[1:])
-    return numero_a_binario(num_reg, 5)
+    if num_reg > 31 or num_reg < 0:
+        raise ValueError(f"Registro Invalido: '{reg}'")
+        
+    return numero_a_binario(num_reg, 5, signed=False)
 
+def puede_representarse_con_signo(numero, bits):
+    min_valor = -(2 ** (bits - 1))
+    max_valor = 2 ** (bits - 1) - 1
+    return min_valor <= numero <= max_valor
+
+def se_puede_representar_sin_signo(num, bits):
+    max_val = 2**bits - 1
+    return 0 <= num <= max_val
+
+def preparar_valores():
+    with open("./values.txt", "r") as f:
+        txt = f.read()
+    list_ = txt.strip().split("\n")
+    return list_
