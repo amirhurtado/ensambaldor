@@ -1,4 +1,4 @@
-from utilidades import leer_instrucciones, labels, is_pseudo
+from utilidades import leer_instrucciones, labels, is_pseudo, crear_archivo
 from ensamblador import ensamblar_instrucciones
 from pseudoinstrucciones import compile_pseudo
 
@@ -39,5 +39,5 @@ def main():
     
 
 instrucciones_binarias = main()
-
-print(instrucciones_binarias)
+crear_archivo("bin.bin", instrucciones_binarias)
+# print(instrucciones_binarias)
