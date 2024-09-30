@@ -1,6 +1,5 @@
 from functools import singledispatch
 from utilidades import cut_symbol
-import re
 
 @singledispatch
 def compile_pseudo(equivalence: str, match: dict, line: str|int):
