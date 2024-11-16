@@ -1,6 +1,7 @@
 from utilidades import leer_instrucciones, labels, is_pseudo, crear_archivo
 from ensamblador import ensamblar_instrucciones
 from pseudoinstrucciones import compile_pseudo
+from files import push_str_bin, push_str_bin_quartus, push_str_hex
 
 instrucciones: list
 
@@ -39,5 +40,7 @@ def main():
     
 
 instrucciones_binarias = main()
-crear_archivo("bin.bin", instrucciones_binarias)
+# crear_archivo("bin.bin", instrucciones_binarias)
+push_str_hex("./output/instructions.hex", instrucciones_binarias)
+push_str_bin_quartus("./output/instructions.bin", instrucciones_binarias)
 # print(instrucciones_binarias)
